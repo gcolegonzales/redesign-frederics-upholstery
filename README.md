@@ -61,7 +61,7 @@ The site ships with on-page SEO retrofitted (visible design and content unchange
 ### Base URL placeholder — replace before deploy
 
 Canonical, `og:url`, `sitemap.xml`, `robots.txt`, and the JSON-LD `url`/`image` all use the literal
-placeholder base URL **`https://REPLACE-WITH-DOMAIN.com/`**. Do a one-line find-and-replace across
+placeholder base URL **`https://fredericsupholstery.com/`**. Do a one-line find-and-replace across
 `index.html`, `robots.txt`, and `sitemap.xml` to swap in the real domain at deploy time. An
 `assets/photos/og-image.jpg` social-share image should also be added (referenced by OG/Twitter/schema).
 
