@@ -46,6 +46,25 @@ menu — all respecting `prefers-reduced-motion`.
 - Review quotes are **representative/paraphrased** of the 5.0 rating pending verbatim access
   (marked with a `TODO` comment).
 
+## SEO
+
+The site ships with on-page SEO retrofitted (visible design and content unchanged):
+
+- Unique `<title>` + meta description, single `<h1>`.
+- **JSON-LD `LocalBusiness`** structured data in `<head>` with real data — name, telephone,
+  `PostalAddress`, `openingHoursSpecification`, `aggregateRating` (5.0 / ~22), `areaServed`, `image`,
+  and `url`. `sameAs` is intentionally omitted pending a verified Facebook/Google profile URL (noted
+  inline in `index.html`).
+- Canonical link, complete Open Graph (`og:type/title/description/url/image`) and Twitter Card tags.
+- `robots.txt` (allow all + `Sitemap:` line) and `sitemap.xml` at the repo root.
+
+### Base URL placeholder — replace before deploy
+
+Canonical, `og:url`, `sitemap.xml`, `robots.txt`, and the JSON-LD `url`/`image` all use the literal
+placeholder base URL **`https://REPLACE-WITH-DOMAIN.com/`**. Do a one-line find-and-replace across
+`index.html`, `robots.txt`, and `sitemap.xml` to swap in the real domain at deploy time. An
+`assets/photos/og-image.jpg` social-share image should also be added (referenced by OG/Twitter/schema).
+
 ## How to view
 
 Open `index.html` in any browser (double-click it), or serve the folder statically. No install needed.
