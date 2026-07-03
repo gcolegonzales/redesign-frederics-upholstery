@@ -36,12 +36,52 @@
   var toggle = document.getElementById("navToggle");
   var menu = document.getElementById("mobileMenu");
   var scrim = document.getElementById("mobileScrim");
+  var mainEl = document.getElementById("main");
+  var footerEl = document.querySelector(".site-footer");
+  var DESKTOP_MQ = window.matchMedia("(min-width: 981px)");
+
+  // Elements outside the drawer to make inert / aria-hidden while it's open.
+  var backgroundEls = [mainEl, footerEl].filter(Boolean);
+
+  function focusableIn(container) {
+    return Array.prototype.slice.call(container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function (el) {
+      return el.offsetWidth > 0 || el.offsetHeight > 0 || el === document.activeElement;
+    });
+  }
+
+  function setBackgroundInert(on) {
+    backgroundEls.forEach(function (el) {
+      if (on) {
+        el.setAttribute("aria-hidden", "true");
+        el.setAttribute("inert", "");
+      } else {
+        el.removeAttribute("aria-hidden");
+        el.removeAttribute("inert");
+      }
+    });
+  }
+
+  // Keep the closed drawer out of the tab order (and hidden from AT) so Tab
+  // can't reach its off-canvas links.
+  function setMenuTabbable(on) {
+    menu.querySelectorAll("a, button").forEach(function (el) {
+      if (on) el.removeAttribute("tabindex");
+      else el.setAttribute("tabindex", "-1");
+    });
+  }
+
   function setMenu(open) {
+    var wasOpen = menu.classList.contains("open");
     menu.classList.toggle("open", open);
     menu.setAttribute("aria-hidden", open ? "false" : "true");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    document.documentElement.style.overflow = open ? "hidden" : "";
     document.body.style.overflow = open ? "hidden" : "";
+    setMenuTabbable(open);
+    setBackgroundInert(open);
     if (scrim) {
       if (open) {
         scrim.hidden = false;
@@ -53,8 +93,17 @@
         setTimeout(function () { if (!menu.classList.contains("open")) scrim.hidden = true; }, 420);
       }
     }
+    if (open) {
+      var f = focusableIn(menu);
+      if (f.length) f[0].focus();
+    } else if (wasOpen) {
+      // Return focus to the toggle after closing.
+      if (toggle) toggle.focus();
+    }
   }
+
   if (toggle && menu) {
+    setMenuTabbable(false); // start closed → not tabbable
     toggle.addEventListener("click", function () {
       setMenu(!menu.classList.contains("open"));
     });
@@ -63,7 +112,24 @@
     });
     if (scrim) scrim.addEventListener("click", function () { setMenu(false); });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && menu.classList.contains("open")) setMenu(false);
+      if (!menu.classList.contains("open")) return;
+      if (e.key === "Escape") { setMenu(false); return; }
+      if (e.key === "Tab") {
+        // Trap Tab within the drawer.
+        var f = focusableIn(menu);
+        if (!f.length) { e.preventDefault(); return; }
+        var first = f[0], last = f[f.length - 1];
+        var active = document.activeElement;
+        if (e.shiftKey) {
+          if (active === first || !menu.contains(active)) { e.preventDefault(); last.focus(); }
+        } else {
+          if (active === last || !menu.contains(active)) { e.preventDefault(); first.focus(); }
+        }
+      }
+    });
+    // Reset drawer + toggle state when crossing into desktop widths.
+    DESKTOP_MQ.addEventListener("change", function (e) {
+      if (e.matches && menu.classList.contains("open")) setMenu(false);
     });
   }
 
