@@ -7,15 +7,27 @@
   var yearEl = document.getElementById("year");
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---- sticky header shrink on scroll ---- */
+  /* ---- sticky header: shrink on scroll + reveal on any upward scroll ---- */
   var header = document.getElementById("siteHeader");
   var lastScrolled = false;
+  var lastY = window.scrollY;
   function onScroll() {
-    var scrolled = window.scrollY > 24;
+    var y = window.scrollY;
+    var scrolled = y > 24;
     if (scrolled !== lastScrolled) {
       header.classList.toggle("scrolled", scrolled);
       lastScrolled = scrolled;
     }
+    // Reveal on ANY upward scroll; hide when scrolling down past the header.
+    var menuOpen = menu && menu.classList.contains("open");
+    if (menuOpen || y <= 24) {
+      header.classList.remove("nav-hidden");
+    } else if (y > lastY + 2) {
+      header.classList.add("nav-hidden");     // scrolling down
+    } else if (y < lastY) {
+      header.classList.remove("nav-hidden");   // scrolling up (even a few px)
+    }
+    lastY = y;
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
@@ -23,12 +35,24 @@
   /* ---- mobile menu ---- */
   var toggle = document.getElementById("navToggle");
   var menu = document.getElementById("mobileMenu");
+  var scrim = document.getElementById("mobileScrim");
   function setMenu(open) {
     menu.classList.toggle("open", open);
     menu.setAttribute("aria-hidden", open ? "false" : "true");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
     document.body.style.overflow = open ? "hidden" : "";
+    if (scrim) {
+      if (open) {
+        scrim.hidden = false;
+        // force reflow so the opacity transition runs
+        void scrim.offsetWidth;
+        scrim.classList.add("open");
+      } else {
+        scrim.classList.remove("open");
+        setTimeout(function () { if (!menu.classList.contains("open")) scrim.hidden = true; }, 420);
+      }
+    }
   }
   if (toggle && menu) {
     toggle.addEventListener("click", function () {
@@ -37,6 +61,7 @@
     menu.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () { setMenu(false); });
     });
+    if (scrim) scrim.addEventListener("click", function () { setMenu(false); });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && menu.classList.contains("open")) setMenu(false);
     });
