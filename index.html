@@ -113,7 +113,7 @@
         <a class="btn btn-solid" href="#quote">Request a Quote</a>
       </div>
 
-      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -122,6 +122,9 @@
   <!-- Mobile menu -->
   <div class="mobile-scrim" id="mobileScrim" hidden></div>
   <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+    <button class="menu-close" id="menuClose" type="button" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
     <nav aria-label="Mobile">
       <a href="#craft">The Craft</a>
       <a href="#work">What We Cover</a>

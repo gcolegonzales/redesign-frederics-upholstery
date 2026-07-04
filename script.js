@@ -35,6 +35,7 @@
   /* ---- mobile menu ---- */
   var toggle = document.getElementById("navToggle");
   var menu = document.getElementById("mobileMenu");
+  var menuClose = document.getElementById("menuClose");
   var scrim = document.getElementById("mobileScrim");
   var mainEl = document.getElementById("main");
   var footerEl = document.querySelector(".site-footer");
@@ -78,8 +79,18 @@
     menu.setAttribute("aria-hidden", open ? "false" : "true");
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-    document.documentElement.style.overflow = open ? "hidden" : "";
+    // Scroll-lock via overflow:hidden on <body> ONLY. This freezes the page at
+    // its current position with NO jump-to-top. (Setting overflow on <html>/the
+    // scrolling element collapses the scroll offset and shifts the page, so we
+    // must not touch it.)
     document.body.style.overflow = open ? "hidden" : "";
+    // The single, always-available close control is the in-drawer X button
+    // (#menuClose), which lives inside the position:fixed drawer — the top-most
+    // layer — so it is on-screen whenever the menu is open, at ANY scroll
+    // position. The header (and its hamburger) is redundant while open and, once
+    // <body> is locked, would stop sticking and drift off-screen anyway; hide it
+    // so there is never a second, competing close control.
+    header.style.visibility = open ? "hidden" : "";
     setMenuTabbable(open);
     setBackgroundInert(open);
     if (scrim) {
@@ -95,7 +106,7 @@
     }
     if (open) {
       var f = focusableIn(menu);
-      if (f.length) f[0].focus();
+      if (f.length) f[0].focus({ preventScroll: true });
     } else if (wasOpen) {
       // Return focus to the toggle after closing.
       if (toggle) toggle.focus();
@@ -107,6 +118,7 @@
     toggle.addEventListener("click", function () {
       setMenu(!menu.classList.contains("open"));
     });
+    if (menuClose) menuClose.addEventListener("click", function () { setMenu(false); });
     menu.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () { setMenu(false); });
     });

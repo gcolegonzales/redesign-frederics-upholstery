@@ -181,6 +181,15 @@ main, .site-header, .site-footer, .mobile-menu { position: relative; z-index: 1;
   overscroll-behavior: contain; overflow-y: auto;
 }
 .mobile-menu.open { transform: translateX(0); }
+.menu-close {
+  position: absolute; top: 1.25rem; right: 1.25rem; z-index: 1;
+  display: grid; place-items: center; width: 44px; height: 44px;
+  padding: 0; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(255,255,255,.08); color: var(--cream);
+  transition: background .25s var(--ease), transform .25s var(--ease);
+  -webkit-tap-highlight-color: transparent; user-select: none;
+}
+.menu-close:hover { background: rgba(255,255,255,.16); transform: rotate(90deg); }
 .mobile-menu nav { display: flex; flex-direction: column; }
 .mobile-menu nav a {
   font-family: var(--font-display); font-size: 1.5rem; padding: .85rem 1rem .85rem 0;
